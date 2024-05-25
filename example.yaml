@@ -1,0 +1,31 @@
+chain: testnet
+db:
+  path: db
+share_rpc:
+  bitcoin:
+    host: 192.168.1.101
+    port: 18332
+    user: jacky
+    password: 123456
+  ord:
+    url: http://192.168.1.101:80
+  ordx:
+    url: http://192.168.1.101:8006
+log:
+  level: debug
+  path: log
+index:
+  exit_on_reach_height: false
+  enable_ordx_fix: false
+rpc_service:
+  addr: 0.0.0.0:80
+  proxy: testnet
+  log_path: "log"
+  swagger:
+    host: apiprd.ordx.space
+    schemes:
+      - http
+  api:
+    apikey_list: []
+    nolimit_api_list:
+      - /health

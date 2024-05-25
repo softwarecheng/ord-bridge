@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package pb.indexer;
+
+option go_package = "/indexer/pb";
+
+message Status {
+    string IndexVersion = 1;
+    string DbVersion = 2;
+    uint64 SyncInscriptionHeight = 3;
+    uint64 SyncTransferInscriptionHeight = 4;
+    uint64 BlessedInscriptions = 5;
+    uint64 CursedInscriptions = 6;
+}
+
+message Inscription {
+    string genesesAddress = 1;
+    string address = 2;
+    repeated string children = 3;
+    uint32 contentLength = 4;
+    string contentType = 5;
+    uint64 fee = 6;
+    uint64 height = 7;
+    string id = 8;
+    string next = 9;
+    int64 number = 10;
+    string parent = 11;
+    string previous = 12;
+    int64 OrdSat = 13;
+    int64 sat = 14;
+    string satPoint = 15;
+    int64 timestamp = 16;
+    uint64 value = 17;
+}

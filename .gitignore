@@ -1,0 +1,11 @@
+# common
+.DS_Store
+.vscode
+*debug_bin*
+db/*
+log/*
+# for conf
+*.yaml
+!example.yaml
+# build execute file
+ord-*
