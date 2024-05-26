@@ -88,7 +88,7 @@ func ParseCmdParams() error {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dbDir, err := util.GetAbsolutePath(dbDir)
+			dbDir, err := util.ParseDirPath(dbDir)
 			if err != nil {
 				return fmt.Errorf("get db dir failed, error: %s", err)
 			}
