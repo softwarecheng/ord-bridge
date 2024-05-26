@@ -9,8 +9,6 @@ import (
 )
 
 func importOrdData(chain, dbDir, importFilePath string) error {
-	g.InitRpc()
-
 	const DBSize = 3000 << 20
 	g.InitOrdDB(dbDir, DBSize)
 	defer g.ReleaseAllDB()
