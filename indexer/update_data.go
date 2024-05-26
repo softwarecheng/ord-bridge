@@ -149,21 +149,21 @@ func (s *Indexer) fetchAndSaveTransferInscriptionList(endHeight uint64) error {
 	fetch2update := func(height uint64) error {
 		blockTxOutputInscriptions := s.getRpcOrdxBlockTxOutputInscriptions(height)
 		if blockTxOutputInscriptions == nil {
-			log.Log.Infof("indexer.updateInscription-> getRpcOrdxBlockTxOutputInscriptions is nil, height: %d", height)
+			log.Log.Infof("indexer.fetchAndSaveTransferInscriptionList-> getRpcOrdxBlockTxOutputInscriptions is nil, height: %d", height)
 			return nil
 		}
 
-		log.Log.Debugf("indexer.updateInscription-> height: %d, need update tx count: %d", height, len(blockTxOutputInscriptions.Inscriptions))
+		log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList-> height: %d, need update tx count: %d", height, len(blockTxOutputInscriptions.Inscriptions))
 		wb := s.db.NewWriteBatch()
 		defer wb.Cancel()
 		for _, ordInscription := range blockTxOutputInscriptions.Inscriptions {
 			// check inscription in db
 			inscription, err := s.GetInscription(ordInscription.Id)
 			if err != nil {
-				return fmt.Errorf("indexer.updateInscription-> GetInscription error: %s, inscriptionId: %s", err, ordInscription.Id)
+				return fmt.Errorf("indexer.fetchAndSaveTransferInscriptionList-> GetInscription error: %s, inscriptionId: %s", err, ordInscription.Id)
 			}
 			if inscription == nil {
-				return fmt.Errorf("indexer.updateInscription-> GetInscription is nil, inscriptionId: %s", ordInscription.Id)
+				return fmt.Errorf("indexer.fetchAndSaveTransferInscriptionList-> GetInscription is nil, inscriptionId: %s", ordInscription.Id)
 			}
 
 			if inscription.Address != ordInscription.Address {
@@ -183,42 +183,42 @@ func (s *Indexer) fetchAndSaveTransferInscriptionList(endHeight uint64) error {
 				inscription.Address = ordInscription.Address
 				inscription.Children = ordInscription.Children
 				if inscription.Fee != ordInscription.Fee {
-					log.Log.Debugf("indexer.updateInscription: id:%s, Fee: new: %d, old: %d", ordInscription.Id, ordInscription.Fee, inscription.Fee)
+					log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList: id:%s, Fee: new: %d, old: %d", ordInscription.Id, ordInscription.Fee, inscription.Fee)
 				}
 				inscription.Fee = ordInscription.Fee
 
 				if inscription.Next != ordInscription.Next {
-					log.Log.Debugf("indexer.updateInscription: id:%s, Next: new: %s, old: %s", ordInscription.Id, ordInscription.Next, inscription.Next)
+					log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList: id:%s, Next: new: %s, old: %s", ordInscription.Id, ordInscription.Next, inscription.Next)
 				}
 				inscription.Next = ordInscription.Next
 
 				if inscription.Parent != ordInscription.Parent {
-					log.Log.Debugf("indexer.updateInscription: id:%s, Parent: new: %s, old: %s", ordInscription.Id, ordInscription.Parent, inscription.Parent)
+					log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList: id:%s, Parent: new: %s, old: %s", ordInscription.Id, ordInscription.Parent, inscription.Parent)
 				}
 				inscription.Parent = ordInscription.Parent
 
 				if inscription.Previous != ordInscription.Previous {
-					log.Log.Debugf("indexer.updateInscription: id:%s, Previous: new: %s, old: %s", ordInscription.Id, ordInscription.Previous, inscription.Previous)
+					log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList: id:%s, Previous: new: %s, old: %s", ordInscription.Id, ordInscription.Previous, inscription.Previous)
 				}
 				inscription.Previous = ordInscription.Previous
 
 				if inscription.Sat != ordInscription.Sat {
-					log.Log.Debugf("indexer.updateInscription: id:%s, Sat: new: %d, old: %d", ordInscription.Id, ordInscription.Sat, inscription.Sat)
+					log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList: id:%s, Sat: new: %d, old: %d", ordInscription.Id, ordInscription.Sat, inscription.Sat)
 				}
 				inscription.Sat = ordInscription.Sat
 
 				if inscription.SatPoint != ordInscription.SatPoint {
-					log.Log.Debugf("indexer.updateInscription: id:%s, SatPoint: new: %s, old: %s", ordInscription.Id, ordInscription.SatPoint, inscription.SatPoint)
+					log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList: id:%s, SatPoint: new: %s, old: %s", ordInscription.Id, ordInscription.SatPoint, inscription.SatPoint)
 				}
 				inscription.SatPoint = ordInscription.SatPoint
 
 				if inscription.Timestamp != ordInscription.Timestamp {
-					log.Log.Debugf("indexer.updateInscription: id:%s, Timestamp: new: %d, old: %d", ordInscription.Id, ordInscription.Timestamp, inscription.Timestamp)
+					log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList: id:%s, Timestamp: new: %d, old: %d", ordInscription.Id, ordInscription.Timestamp, inscription.Timestamp)
 				}
 				inscription.Timestamp = ordInscription.Timestamp
 
 				if inscription.Value != ordInscription.Value {
-					log.Log.Debugf("indexer.updateInscription: id:%s, Value: new: %d, old: %d", ordInscription.Id, ordInscription.Value, inscription.Value)
+					log.Log.Debugf("indexer.fetchAndSaveTransferInscriptionList: id:%s, Value: new: %d, old: %d", ordInscription.Id, ordInscription.Value, inscription.Value)
 				}
 				inscription.Value = ordInscription.Value
 
@@ -249,7 +249,7 @@ func (s *Indexer) fetchAndSaveTransferInscriptionList(endHeight uint64) error {
 			log.Log.Error(err)
 			return err
 		}
-		log.Log.Infof("indexer.updateInscription-> flush height: %d, inscription count: %d", curHeight, len(blockTxOutputInscriptions.Inscriptions))
+		log.Log.Infof("indexer.fetchAndSaveTransferInscriptionList-> flush height: %d, inscription count: %d", curHeight, len(blockTxOutputInscriptions.Inscriptions))
 		return nil
 	}
 
