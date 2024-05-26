@@ -18,7 +18,7 @@ func (s *Indexer) saveInscriptionList() error {
 	startTime := time.Now()
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	log.Log.Debugf("indexer.saveNewInscription-> start stat: program alloc memory: %dMB, sys alloc memory: %dMB, inscription cache count: %d",
+	log.Log.Debugf("indexer.saveInscriptionList-> start stat: program alloc memory: %dMB, sys alloc memory: %dMB, inscription cache count: %d",
 		int(float64(m.Alloc)/1024/1024), int(float64(m.Sys)/1024/1024), s.inscriptionMapCount)
 
 	wb := s.db.NewWriteBatch()
@@ -131,7 +131,7 @@ func (s *Indexer) saveInscriptionList() error {
 		return fmt.Errorf("setDB error: %v", err)
 	}
 
-	log.Log.Infof("indexer.saveNewInscription-> update inscription count: %d, syncStats:{ SyncHeight: %d, Blessed: %d, Cursed: %d }",
+	log.Log.Infof("indexer.saveInscriptionList-> update inscription count: %d, syncStats:{ SyncHeight: %d, Blessed: %d, Cursed: %d }",
 		inscriptionCount, s.status.SyncInscriptionHeight, s.status.BlessedInscriptions, s.status.CursedInscriptions)
 	err = wb.Flush()
 	if err != nil {
@@ -139,7 +139,7 @@ func (s *Indexer) saveInscriptionList() error {
 	}
 
 	runtime.ReadMemStats(&m)
-	log.Log.Debugf("indexer.saveNewInscription-> end stat: program alloc memory: %dMB, sys alloc memory: %dMB, inscription cache count: %d, elapsedTime: %v",
+	log.Log.Debugf("indexer.saveInscriptionList-> end stat: program alloc memory: %dMB, sys alloc memory: %dMB, inscription cache count: %d, elapsedTime: %v",
 		int(float64(m.Alloc)/1024/1024), int(float64(m.Sys)/1024/1024), s.inscriptionMapCount, time.Since(startTime))
 	return nil
 }
