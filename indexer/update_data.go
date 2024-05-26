@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/dgraph-io/badger/v4"
 	"github.com/softwarecheng/ord-bridge/common/db/proto3"
 	"github.com/softwarecheng/ord-bridge/common/db/raw"
 	"github.com/softwarecheng/ord-bridge/common/log"
@@ -126,7 +127,7 @@ func (s *Indexer) saveInscriptionList() error {
 
 	s.status.CursedInscriptions += cursedCount
 	s.status.BlessedInscriptions += blessedCount
-	err = proto3.BatchSet([]byte(DBKEY_Stats), s.status, wb)
+	err = proto3.BatchSet([]byte(DBKEY_Status), s.status, wb)
 	if err != nil {
 		return fmt.Errorf("setDB error: %v", err)
 	}
@@ -159,11 +160,22 @@ func (s *Indexer) fetchAndSaveTransferInscriptionList(endHeight uint64) error {
 		for _, ordInscription := range blockTxOutputInscriptions.Inscriptions {
 			// check inscription in db
 			inscription, err := s.GetInscription(ordInscription.Id)
-			if err != nil {
-				return fmt.Errorf("indexer.fetchAndSaveTransferInscriptionList-> GetInscription error: %s, inscriptionId: %s", err, ordInscription.Id)
+			if err != badger.ErrKeyNotFound {
+				err = fmt.Errorf("ordinals.indexer.fetchInscriptionList.updateInscription-> GetInscription error: %v, inscriptionId: %s",
+					err, ordInscription.Id)
+				return err
 			}
-			if inscription == nil {
-				return fmt.Errorf("indexer.fetchAndSaveTransferInscriptionList-> GetInscription is nil, inscriptionId: %s", ordInscription.Id)
+			if err == badger.ErrKeyNotFound || inscription == nil {
+				s.status.SyncInscriptionHeight = ordInscription.Height
+				s.status.SyncTransferInscriptionHeight = ordInscription.Height
+				err = proto3.Set([]byte(DBKEY_Status), s.status, s.db)
+				if err != nil {
+					log.Log.Errorf("ordinals.indexer.fetchInscriptionList.updateInscription-> setDB error: %v", err)
+				}
+				s.syncFetchDataList = make(map[uint64]uint64)
+				err = fmt.Errorf("ordinals.indexer.fetchInscriptionList.updateInscription-> GetInscription is nil, inscriptionId: %s, need recover height: %d",
+					ordInscription.Id, ordInscription.Height)
+				return err
 			}
 
 			if inscription.Address != ordInscription.Address {
@@ -237,7 +249,7 @@ func (s *Indexer) fetchAndSaveTransferInscriptionList(endHeight uint64) error {
 		}
 
 		s.status.SyncTransferInscriptionHeight = curHeight
-		err := proto3.BatchSet([]byte(DBKEY_Stats), s.status, wb)
+		err := proto3.BatchSet([]byte(DBKEY_Status), s.status, wb)
 		if err != nil {
 			err = fmt.Errorf("proto3.BatchSet error: %s", err)
 			return err

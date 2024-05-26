@@ -155,7 +155,7 @@ func (s *Indexer) syncData(maxHeight uint64) error {
 			inscriptionDataList := fetchData.InscriptionList
 			if len(inscriptionDataList) == 0 {
 				s.status.SyncInscriptionHeight = s.calcSyncInscriptionHeight()
-				err := proto3.Set([]byte(DBKEY_Stats), s.status, s.db)
+				err := proto3.Set([]byte(DBKEY_Status), s.status, s.db)
 				if err != nil {
 					return err
 				}

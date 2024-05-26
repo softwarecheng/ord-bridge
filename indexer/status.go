@@ -23,7 +23,7 @@ func (s *Indexer) loadStats() error {
 			BlessedInscriptions:           0,
 			CursedInscriptions:            0,
 		}
-		err := proto3.TxnGet([]byte(DBKEY_Stats), txn, status)
+		err := proto3.TxnGet([]byte(DBKEY_Status), txn, status)
 		if err == badger.ErrKeyNotFound {
 			log.Log.Info("indexer.loadStatus-> No status found in db")
 		} else if err != nil {

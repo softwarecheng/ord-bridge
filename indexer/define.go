@@ -15,7 +15,7 @@ var (
 )
 
 const (
-	DBKEY_Stats     = "stats"
+	DBKEY_Status    = "stats"
 	periodFlushToDB = 100
 	NOADDRESS       = "UNKNOWN"
 )
