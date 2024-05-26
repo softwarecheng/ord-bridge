@@ -11,8 +11,8 @@ import (
 	"github.com/softwarecheng/ord-bridge/rpc/ordx"
 )
 
-func getInscriptionId(txn *badger.Txn, key string) (string, error) {
-	data, err := raw.TxnGet([]byte(key), txn)
+func getInscriptionId(key string, db *badger.DB) (string, error) {
+	data, err := raw.Get([]byte(key), db)
 	if err != nil {
 		return "", err
 	}
@@ -91,7 +91,7 @@ func (s *Indexer) getInscriptionList(key string) (inscriptionList map[string]*pb
 		for _, inscriptionId := range inscriptionIdList {
 			key = s.getInscriptionIdDbKey(inscriptionId)
 			inscription := new(pb.Inscription)
-			err = proto3.TxnGetWithProto3([]byte(key), inscription, txn)
+			err = proto3.TxnGet([]byte(key), inscription, txn)
 			if err != nil {
 				return err
 			}
@@ -107,11 +107,9 @@ func (s *Indexer) getInscriptionList(key string) (inscriptionList map[string]*pb
 }
 
 func (s *Indexer) GetInscription(inscriptionId string) (inscription *pb.Inscription, err error) {
-	err = s.db.View(func(txn *badger.Txn) error {
-		key := s.getInscriptionIdDbKey(inscriptionId)
-		inscription = new(pb.Inscription)
-		return proto3.TxnGetWithProto3([]byte(key), inscription, txn)
-	})
+	key := s.getInscriptionIdDbKey(inscriptionId)
+	inscription = new(pb.Inscription)
+	err = proto3.Get([]byte(key), inscription, s.db)
 	if err != nil {
 		return nil, err
 	}
@@ -123,16 +121,14 @@ func (s *Indexer) GetInscription(inscriptionId string) (inscription *pb.Inscript
 }
 
 func (s *Indexer) GetInscriptionWithNumber(inscriptionNum int64) (inscription *pb.Inscription, err error) {
-	err = s.db.View(func(txn *badger.Txn) error {
-		key := s.getInscriptionNumberDbKey(inscriptionNum)
-		inscriptionId, err := getInscriptionId(txn, key)
-		if err != nil {
-			return err
-		}
-		key = s.getInscriptionIdDbKey(inscriptionId)
-		inscription = new(pb.Inscription)
-		return proto3.TxnGetWithProto3([]byte(key), inscription, txn)
-	})
+	key := s.getInscriptionNumberDbKey(inscriptionNum)
+	inscriptionId, err := getInscriptionId(key, s.db)
+	if err != nil {
+		return nil, err
+	}
+	key = s.getInscriptionIdDbKey(inscriptionId)
+	inscription = new(pb.Inscription)
+	err = proto3.Get([]byte(key), inscription, s.db)
 	if err != nil {
 		return nil, err
 	}

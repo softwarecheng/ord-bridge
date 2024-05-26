@@ -159,13 +159,10 @@ func (s *Indexer) fetchAndSaveTransferInscriptionList(endHeight uint64) error {
 		defer wb.Cancel()
 		for _, ordInscription := range blockTxOutputInscriptions.Inscriptions {
 			// check inscription in db
-			inscription, err := s.GetInscription(ordInscription.Id)
-			if err != nil && err != badger.ErrKeyNotFound {
-				err = fmt.Errorf("ordinals.indexer.fetchInscriptionList.updateInscription-> GetInscription error: %v, inscriptionId: %s",
-					err, ordInscription.Id)
-				return err
-			}
-			if err == badger.ErrKeyNotFound || inscription == nil {
+			key := s.getInscriptionIdDbKey(ordInscription.Id)
+			inscription := &pb.Inscription{}
+			err := proto3.Get([]byte(key), inscription, s.db)
+			if err == badger.ErrKeyNotFound {
 				s.status.SyncInscriptionHeight = ordInscription.Height - 1
 				s.status.SyncTransferInscriptionHeight = s.status.SyncInscriptionHeight
 				err = proto3.Set([]byte(DBKEY_Status), s.status, s.db)
@@ -175,6 +172,10 @@ func (s *Indexer) fetchAndSaveTransferInscriptionList(endHeight uint64) error {
 				s.syncFetchDataList = make(map[uint64]uint64)
 				err = fmt.Errorf("ordinals.indexer.fetchInscriptionList.updateInscription-> GetInscription is nil, inscriptionId: %s, need recover height: %d",
 					ordInscription.Id, ordInscription.Height)
+				return err
+			} else if err != nil {
+				err = fmt.Errorf("ordinals.indexer.fetchInscriptionList.updateInscription-> GetInscription error: %v, inscriptionId: %s",
+					err, ordInscription.Id)
 				return err
 			}
 

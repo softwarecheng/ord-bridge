@@ -32,10 +32,10 @@ func BatchSet(key []byte, data protoreflect.ProtoMessage, wb *badger.WriteBatch)
 	return nil
 }
 
-func Get(key []byte, target protoreflect.ProtoMessage, db *badger.DB) error {
+func Get(key []byte, protoMsg protoreflect.ProtoMessage, db *badger.DB) error {
 	var err error
 	return db.View(func(txn *badger.Txn) error {
-		err = TxnGet(key, txn, target)
+		err = TxnGet(key, protoMsg, txn)
 		if err != nil {
 			return err
 		}
@@ -43,17 +43,7 @@ func Get(key []byte, target protoreflect.ProtoMessage, db *badger.DB) error {
 	})
 }
 
-func TxnGet(key []byte, txn *badger.Txn, target protoreflect.ProtoMessage) error {
-	item, err := txn.Get([]byte(key))
-	if err != nil {
-		return err
-	}
-	return item.Value(func(v []byte) error {
-		return proto.Unmarshal(v, target)
-	})
-}
-
-func TxnGetWithProto3(key []byte, protoMsg protoreflect.ProtoMessage, txn *badger.Txn) error {
+func TxnGet(key []byte, protoMsg protoreflect.ProtoMessage, txn *badger.Txn) error {
 	item, err := txn.Get([]byte(key))
 	if err != nil {
 		return err
