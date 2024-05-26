@@ -160,14 +160,14 @@ func (s *Indexer) fetchAndSaveTransferInscriptionList(endHeight uint64) error {
 		for _, ordInscription := range blockTxOutputInscriptions.Inscriptions {
 			// check inscription in db
 			inscription, err := s.GetInscription(ordInscription.Id)
-			if err != badger.ErrKeyNotFound {
+			if err != nil && err != badger.ErrKeyNotFound {
 				err = fmt.Errorf("ordinals.indexer.fetchInscriptionList.updateInscription-> GetInscription error: %v, inscriptionId: %s",
 					err, ordInscription.Id)
 				return err
 			}
 			if err == badger.ErrKeyNotFound || inscription == nil {
-				s.status.SyncInscriptionHeight = ordInscription.Height
-				s.status.SyncTransferInscriptionHeight = ordInscription.Height
+				s.status.SyncInscriptionHeight = ordInscription.Height - 1
+				s.status.SyncTransferInscriptionHeight = s.status.SyncInscriptionHeight
 				err = proto3.Set([]byte(DBKEY_Status), s.status, s.db)
 				if err != nil {
 					log.Log.Errorf("ordinals.indexer.fetchInscriptionList.updateInscription-> setDB error: %v", err)
