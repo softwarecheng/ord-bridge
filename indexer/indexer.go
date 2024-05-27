@@ -189,11 +189,11 @@ func (s *Indexer) syncData(maxHeight uint64) error {
 				fetchData.BlockHeight, s.status.SyncInscriptionHeight)
 
 			if (maxHeight - s.status.SyncInscriptionHeight) == 0 {
+				s.syncFetchDataList = make(map[uint64]uint64)
 				err := s.saveInscriptionList()
 				if err != nil {
 					return err
 				}
-				s.syncFetchDataList = make(map[uint64]uint64)
 				return nil
 			}
 
