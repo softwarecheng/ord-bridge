@@ -14,7 +14,7 @@ func NewService() *Service {
 func (s *Service) InitRouter(r *gin.Engine, basePath string) {
 	group := r.Group(basePath + "/btc")
 	//broadcast raw tx => blockstream api: POST /tx
-	group.POST(basePath+"/tx", s.sendRawTx)
+	group.POST("/tx", s.sendRawTx)
 	//get raw block => blockstream api: GET /block/:hash
-	group.POST(basePath+"/getrawblock", s.getRawBlock)
+	group.POST("/getrawblock", s.getRawBlock)
 }
